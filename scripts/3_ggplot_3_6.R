@@ -1,5 +1,61 @@
 library("tidyverse")
 
+#3.3
+
+#1
+
+# Needs to be outside mapping, since mapping specify relation between variable and value.
+# This is what is likely meant
+
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy), colour = "blue")
+
+#2
+
+?mpg
+glimpse(mpg)
+
+# chr ones are categorical
+# int or dbl are continuous
+
+#3
+
+# Map cty (city miles per gallon) which is continuous to colour. It becomes a scale of colour and not descrete colours. 
+
+ggplot(mpg, aes(x = displ, y = hwy, colour = cty)) +
+  geom_point()
+
+# Scale of sizes
+
+ggplot(mpg, aes(x = displ, y = hwy, size = cty)) +
+  geom_point()
+
+# Shape is not possible
+
+ggplot(mpg, aes(x = displ, y = hwy, shape = cty)) +
+  geom_point()
+
+#4
+
+ggplot(mpg, aes(x = displ, y = hwy, colour = hwy, size = displ)) +
+  geom_point()
+
+# We get a plot but redundant information since size and x-axis position give the same information. Same for colour
+
+#5
+
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(shape = 21, colour = "black", fill = "white", size = 2, stroke = 5)
+
+# Creates an "aura" or border with thickness of the specified value
+
+#6
+
+ggplot(mpg, aes(x = displ, y = hwy, colour = displ < 5)) +
+  geom_point()
+
+# It creates a colour boolean, so that above and below have a colour each
+
 #3.6
 
 #1
