@@ -20,7 +20,8 @@ glimpse(mpg)
 
 #3
 
-# Map cty (city miles per gallon) which is continuous to colour. It becomes a scale of colour and not descrete colours. 
+# Map cty (city miles per gallon) which is continuous to colour. 
+# It becomes a scale of colour and not descrete colours. 
 
 ggplot(mpg, aes(x = displ, y = hwy, colour = cty)) +
   geom_point()
@@ -85,7 +86,7 @@ ggplot(data = mpg) +
     show.legend = FALSE
   )
 
-#in the name, legend will not be shown. 
+# in the name, legend will not be shown. If we delete, it is there, so it is on by default
 
 #4
 
