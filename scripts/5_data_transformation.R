@@ -14,6 +14,7 @@ filter(flights, arr_delay >= 120)
 filter(flights, dest == "IAH" | dest == "HOU")
 
 # %in% scales better
+
 filter(flights, dest %in% c("IAH", "HOU"))
 
 
@@ -49,7 +50,7 @@ filter(flights, dep_time %% 2400 <= 600)
 
 # 2
 
-#between(x, left, right) x is larger or = to left and equal or smaller than right. Good readability
+#between(x, left, right) x is larger or = to left and equal or smaller than right.
 
 filter(flights, between(month, 7, 9))
 
@@ -66,6 +67,9 @@ filter(flights, is.na(dep_time))
 #  & TRUE is Na, Na could be FALSE
 
 # x * 0 = 0 for finite numbers, but Inf and -Inf are NaN, not a number
+
+Inf * 0
+
 
 # 5.3
 
@@ -111,7 +115,7 @@ arrange(flights, distance)
 
 select(flights, dep_time, dep_delay, arr_time, arr_delay)
 
-# Cols are strings, remember for later
+# Col names are strings, remember for later
 select(flights, "dep_time", "dep_delay", "arr_time", "arr_delay")
 
 select(flights, 4, 6, 7, 9)
@@ -128,16 +132,15 @@ select(flights, year, month, day, year, year)
 
 # 3
 
-#one_of() function selects variables with a character vector rather than unquoted variable name arguments. 
-# This function is useful because it is easier to programmatically generate character vectors
-#with variable names than to generate unquoted variable names, which are easier to type.
+# one_of() function selects variables with a character vector rather than unquoted variable name arguments. 
+
 vars <- c("year", "month", "day", "dep_delay", "arr_delay")
 select(flights, one_of(vars))
 
 # 4
 
 select(flights, contains("TIME"))
-#Not case sensitive but we can make it if we want:
+# Not case sensitive but we can make it if we want:
 
 select(flights, contains("TIME", ignore.case = FALSE))
 
@@ -180,15 +183,15 @@ flights_airtime <-
          air_time_diff = air_time - arr_time + dep_time
   )
 
-#in diff there should now be no flights:
+# in diff there should now be no flights:
 
 nrow(filter(flights_airtime, air_time_diff != 0))
 
-# Could be passed midnight or time zones
+# Either flight passed midnight or crossed time zones
 
 # 3
 
-# we expect dep_time - sched_dep_time = dep_delay
+# We expect dep_delay = dep_time - sched_dep_time
 
 flights_deptime <-
   mutate(flights,
@@ -203,7 +206,7 @@ flights_deptime <-
 
 filter(flights_deptime, dep_delay_diff != 0)
 
-# Since it is just departure, timezones do not account for this but delay past midnight is
+# Since it is just departure, timezones do not account for this but delay past midnight is.
 
 # 4
 
@@ -214,7 +217,7 @@ flights %>%
 
 # This code ranks flights by arrival delay in descending order, selects the five most delayed flights 
 # (including ties) and arranges them by their rank.
-# min_rank() does the same as sportsrankings, in that it assigns the same rank 
+# min_rank() does the same as sports rankings, in that it assigns the same rank 
 # to tied values and skips subsequent ranks accordingly
 
 # 5
@@ -230,15 +233,19 @@ flights %>%
 
 # 1
 # The cost function is what matters, the arrival is the only delay we care about
-# and the consistancy as well. Dont need to find ways to measure this, just reflect on it
+# and the consistency as well. Don't need to find ways to measure this, just reflect on it
 
 # 2
+
+not_cancelled <- flights %>%
+  filter(!is.na(dep_delay), !is.na(arr_delay))
 
 # n() 
 not_cancelled %>%
   group_by(dest) %>%
   summarise(n = n())
 
+# wt = distance is the same as saying sum(distance)
 not_cancelled %>%
   group_by(tailnum) %>%
   summarise(n = sum(distance))
@@ -247,12 +254,18 @@ not_cancelled %>%
 
 # If a flight never departs, then it won’t arrive. A flight could also depart and not arrive 
 # if it is redirected and lands in an airport other than its intended destination. 
-# So the most important column is arr_delay, which indicates the amount of delay in arrival.
+# So the most important column is arr_delay. 
 
+# Some flights depart but don't arrive where they should:
 filter(flights, !is.na(dep_delay), is.na(arr_delay)) %>%
   select(dep_time, arr_time, sched_arr_time, dep_delay, arr_delay)
 
+
 # 4
+
+# We can make an indicator for if the flight is cancelled and make a grouped 
+# summary of cancelled_num = the number of flights that were cancelled on that day
+# and flights_num = the total number of flights scheduled for that day
 
 cancelled_per_day <- 
   flights %>%
@@ -266,6 +279,8 @@ cancelled_per_day <-
 ggplot(cancelled_per_day) +
   geom_point(aes(x = flights_num, y = cancelled_num))
 
+# Congestion could cause cancellations, we can try to plot delay vs proportion of cancellations
+# Remember mean() of a boolean is a proportion
 
 cancelled_and_delays <- 
   flights %>%
@@ -275,8 +290,7 @@ cancelled_and_delays <-
     cancelled_prop = mean(cancelled),
     avg_dep_delay = mean(dep_delay, na.rm = TRUE),
     avg_arr_delay = mean(arr_delay, na.rm = TRUE)
-  ) %>%
-  ungroup()
+  )
 
 ggplot(cancelled_and_delays) +
   geom_point(aes(x = avg_dep_delay, y = cancelled_prop))
@@ -287,6 +301,8 @@ ggplot(cancelled_and_delays) +
 
 # 5
 
+# Worst delays by carrier
+
 flights %>%
   group_by(carrier) %>%
   summarise(arr_delay = mean(arr_delay, na.rm = TRUE)) %>%
@@ -295,9 +311,12 @@ flights %>%
 
 filter(airlines, carrier == "F9")
 
+# Can you disentangle the effects of bad airports vs. bad carriers?
+# Comparing the delay of carrier within each route
+
 flights %>%
   filter(!is.na(arr_delay)) %>%
-  # Total delay by carrier within each origin, dest
+  # Total delay by carrier within each origin + dest
   group_by(origin, dest, carrier) %>%
   summarise(
     arr_delay = sum(arr_delay),
@@ -324,6 +343,10 @@ flights %>%
   summarise(arr_delay_diff = mean(arr_delay_diff)) %>%
   arrange(desc(arr_delay_diff))
 
+# This code compares each carrier’s average arrival delay on a given route to the average delay of all other carriers
+# on the same route, then averages those differences across all routes for each carrier 
+# to see who performs better or worse than their competition
+
 # 6
 
 # The sort argument to count() sorts the results in order of n. 
@@ -332,18 +355,86 @@ flights %>%
 flights %>%
   count(dest, sort = TRUE)
 
-# 7
 
-# see solutions
 
 # 5.7
 
+# 1:
+
+tibble(x = 1:9,
+       group = rep(c("a", "b", "c"), each = 3)) %>%
+  mutate(x_mean = mean(x)) %>%
+  group_by(group) %>%
+  mutate(x_mean_2 = mean(x))
+
+# + - * / not affected by group_by:
+
+tibble(x = 1:9,
+       group = rep(c("a", "b", "c"), each = 3)) %>%
+  mutate(y = x + 2) %>%
+  group_by(group) %>%
+  mutate(z = x + 2)
+
+# modular arithmetic operators like %/% and %% are not either
+
+tibble(x = 1:9,
+       group = rep(c("a", "b", "c"), each = 3)) %>%
+  mutate(y = x %% 2) %>%
+  group_by(group) %>%
+  mutate(z = x %% 2)
+
+# Same for log()
+
+tibble(x = 1:9,
+       group = rep(c("a", "b", "c"), each = 3)) %>%
+  mutate(y = log(x)) %>%
+  group_by(group) %>%
+  mutate(z = log(x))
+
+# Cumulative and rolling aggregates cumsum(), cumprod(), cummin() and cummax are, gives by group:
+
+tibble(x = 1:9,
+       group = rep(c("a", "b", "c"), each = 3)) %>%
+  mutate(x_cumsum = cumsum(x)) %>%
+  group_by(group) %>%
+  mutate(x_cumsum_2 = cumsum(x))
+
+# Logical comparisons, <, <=, >, >=, !=, and == are not affected by group_by()
+
+tibble(x = 1:9,
+       y = 9:1,
+       group = rep(c("a", "b", "c"), each = 3)) %>%
+  mutate(x_lte_y = x <= y) %>%
+  group_by(group) %>%
+  mutate(x_lte_y_2 = x <= y)
+
+# arrange() ignores groups when sorting: 
+
+tibble(x = runif(9),
+       group = rep(c("a", "b", "c"), each = 3)) %>%
+  group_by(group) %>%
+  arrange(x)
+ 
+# Ranking functions like min_rank() work within each group when used with group_by()
+
+
+tibble(x = 1:9,
+       group = rep(c("a", "b", "c"), each = 3)) %>%
+  mutate(rnk = min_rank(x)) %>%
+  group_by(group) %>%
+  mutate(rnk2 = min_rank(x))
+
+
+# 2
+
+
+# Worst on-time record can be either:
 #1 proportion of flights not delayed or cancelled, to get proper sample size n >= 20 
 #2 and mean arrival delay.
 
 
 flights %>%
-  filter(!is.na(tailnum), is.na(arr_time) | !is.na(arr_delay)) %>%
+  filter(!is.na(tailnum), !is.na(arr_delay)) %>%
   mutate(on_time = !is.na(arr_time) & (arr_delay <= 0)) %>%
   group_by(tailnum) %>%
   summarise(on_time = mean(on_time), n = n()) %>%
@@ -379,9 +470,6 @@ flights %>%
   arrange(dest, desc(arr_delay_prop))
 
 
-
-# 5
- 
 # Skip this and forward, too long
 
 
