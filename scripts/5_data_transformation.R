@@ -280,7 +280,7 @@ ggplot(cancelled_per_day) +
   geom_point(aes(x = flights_num, y = cancelled_num))
 
 # Congestion could cause cancellations, we can try to plot delay vs proportion of cancellations
-# Remember mean() of a boolean is a proportion
+# Remember mean() of a Boolean is a proportion
 
 cancelled_and_delays <- 
   flights %>%
@@ -311,6 +311,8 @@ flights %>%
 
 filter(airlines, carrier == "F9")
 
+
+# skip this,  way too long
 # Can you disentangle the effects of bad airports vs. bad carriers?
 # Comparing the delay of carrier within each route
 

@@ -16,7 +16,9 @@ is_tibble(as_tibble(mtcars))
 
 df <- data.frame(abc = 1, xyz = "a")
 
+# partial matching
 df$x
+# all rows from col "xyz"
 df[, "xyz"]
 df[, c("abc", "xyz")]
 
@@ -32,9 +34,13 @@ tbl[, c("abc", "xyz")]
 #You can use the double bracket, like df[[var]]. 
 #You cannot use $, because df$var would look for a column named var.
 
+df <- mtcars
+
 var <- "mpg"
 
 df[[var]]
+
+df$var
 
 #4
 
