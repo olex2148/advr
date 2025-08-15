@@ -59,7 +59,7 @@ annoying[["1"]]
 ggplot(annoying, aes(x = `1`, y = `2`)) +
   geom_point()
 
-#.3
+#.3 haven't learned mutate yet
 
 annoying <- mutate(annoying, `3` = `2` / `1`)
 
@@ -70,7 +70,7 @@ annoying
 
 #5
 
-#Converts named vectors into a dataframe:
+#Converts named vectors into a tibble:
 
 enframe(c(a = 1, b = 2, c = 3))
 
@@ -82,7 +82,7 @@ enframe(c(a = 1, b = 2, c = 3))
 
 ?print.tbl
 
-#max_extra_cols was previously n_extra
+# How many more cols is specified by max_extra_cols was previously n_extra
 
 
 
