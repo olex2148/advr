@@ -48,9 +48,10 @@ filter(flights, dep_time <= 600 | dep_time == 2400)
 #Modulus operation would also be good, we will see this later:
 filter(flights, dep_time %% 2400 <= 600)
 
+
 # 2
 
-#between(x, left, right) x is larger or = to left and equal or smaller than right.
+#between(x, left, right) x is larger or = to left and equal or smaller or equal to than right.
 
 filter(flights, between(month, 7, 9))
 
@@ -61,7 +62,7 @@ filter(flights, is.na(dep_time))
 
 # 4
 
-#anything ^0 = 1
+# Anything ^0 = 1
 # Na|TRUE is unknown or TRUE, so true. 
 # FALSE & Na is FALSE or Na so FALSE
 #  & TRUE is Na, Na could be FALSE
@@ -69,7 +70,6 @@ filter(flights, is.na(dep_time))
 # x * 0 = 0 for finite numbers, but Inf and -Inf are NaN, not a number
 
 Inf * 0
-
 
 # 5.3
 
